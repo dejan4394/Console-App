@@ -1,13 +1,14 @@
-const axios = require('axios')
+import axios from 'axios';
 
+//--LINK TO TECEIPT DETAILS--//
 const url = "https://interview-task-api.mca.dev/qr-scanner-codes/alpha-qr-gFpwhsQ8fkY1";
 
-
+//--GET RECEIPT DETAILS FROM SERVER--//
 axios.get(url)
 .then(res=>{
     var products = res.data
 
-    function compare( a, b ) {
+    const compare = ( a, b )=> {
         
         if ( a.name < b.name ){
           return -1;
@@ -21,8 +22,9 @@ axios.get(url)
       //--ALL PRODUCTS SORTED BY NAME--//
       var sortedByFirstLetter = products.sort( compare );
       
-      //--DOMESTIC FUNCTIONS--//
+      //--DOMESTIC - FUNCTIONS--//
       const domestic = sortedByFirstLetter.filter(obj => obj.domestic);
+
       const domesticCost = ()=> {
         var sumDomestic = 0;
         domestic.forEach(item=>sumDomestic += item.price)
@@ -30,8 +32,9 @@ axios.get(url)
       };
       let domesticCount = domestic.length;
       
-      //--IMPORTED FUNCTIONS--//
+      //--IMPORTED - FUNCTIONS--//
       const imported = sortedByFirstLetter.filter(obj => !(obj.domestic));
+
       const importedCost = ()=> {
         var sumImported = 0;
         imported.forEach(item=>sumImported += item.price)
@@ -39,43 +42,51 @@ axios.get(url)
       };
       let importedCount = imported.length;
 
-    //----RECEIPT-------------------//
+      //--TRUNCATE DESCRIPTION--//
+      const truncate = (str, n)=>{
+        return((str.description.length) >= n ? `${str.description.substr( 0, 10)}...` : str.description);
+      }
 
-      //DOMESTIC//
+
+    //----***RECEIPT***------------------------------------------------------------------------------//
+
+      //PRINT LIST OFF DOMESTIC//
       console.log("     .Domestic");
       sortedByFirstLetter.forEach(item => {
         item.domestic &&
         console.log(
         `     ...${item.name}
         price:${item.price}
+        ${truncate(item, 10)}
         weight:${item.hasOwnProperty('weight')? item.weight: 'N/A'}`
         );  
     });
 
-      //IMPORTED//
+      //PRINT LIST OFF IMPORTED//
       console.log("     .Imported");
       sortedByFirstLetter.forEach(item => {
         !item.domestic &&
         console.log(
         `     ...${item.name}
         price:${item.price}
+        ${truncate(item, 10)}
         weight:${item.hasOwnProperty('weight')? item.weight: 'N/A'}`
         );  
     });
 
-      //DOMESTIC COST//
+      //PRINT DOMESTIC COST//
         console.log(`     Domestic cost: $${Math.round(domesticCost() * 100/100).toFixed(1)}`);
 
-      //IMPORTED COST//
+      //PRINT IMPORTED COST//
         console.log(`     Imported cost: $${Math.round(importedCost() * 100/100).toFixed(1)}`);
 
-      //DOMESTIC COUNT//
+      //PRINT DOMESTIC COUNT//
         console.log(`     Domestic count: ${domesticCount}`);
 
-      //IMPORTED COUNT//
+      //PRINT IMPORTED COUNT//
         console.log(`     Imported count: ${importedCount}`);
 
-
+    //---***END OFF RECEIPT***------------------------------------------------------------------------//
 })
 .catch(err => {
   console.log(err.message);
